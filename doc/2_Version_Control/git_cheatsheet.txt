@@ -1,0 +1,23 @@
+Git Commands-------------------------------------------------
+git commit-This like a savepoint in your project.
+You can add a message to this commit.
+
+git branch - This allows you to see a list of branches in you respository.
+Several other functions can be done with other different things appended on to the end.
+
+git checkout - This allows you to switch from one branch to the other.
+
+git pull - This fetches the changes form the remote respository.
+Then merges them with your changes. This combines git fetch and git merge.
+If you use git pull --rebase it will combine git fetch and git rebase.
+
+
+git push - This uploads changes to the remote depository that you have made.
+
+git merge - This command integrate one branch onto another branch.
+
+git rebase - This takes the commits of one branch,
+and adds them to the end of the commit of a another branch.
+
+git fetch - This is used to download commits to your local respository 
+from a remote respository.
