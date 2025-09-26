@@ -1,6 +1,7 @@
 Git Commands-------------------------------------------------
+
 git commit-This like a savepoint in your project.
-You can add a message to this commit.
+You can add a message to this commit.To add a specifc message us -m 'Your message'
 
 git branch - This allows you to see a list of branches in you respository.
 Several other functions can be done with other different things appended on to the end.
@@ -13,6 +14,8 @@ If you use git pull --rebase it will combine git fetch and git rebase.
 
 
 git push - This uploads changes to the remote depository that you have made.
+The first time pushing a file to branch on github you must you u-<branchname>
+afterwards.
 
 git merge - This command integrate one branch onto another branch.
 
@@ -21,3 +24,12 @@ and adds them to the end of the commit of a another branch.
 
 git fetch - This is used to download commits to your local respository 
 from a remote respository.
+
+git add - This adds the file to your "staging area" for git to track it,
+for future commits.
+
+git status - This shows you the current status of your respository including if you are
+up to date with the current respository and if you have any untracked files.
+
+git log - This gives you a history of all the commits made to the respository,
+and information regarding those commits as well as the respository itself.
