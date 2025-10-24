@@ -39,7 +39,7 @@ int main(void){
                 }else{
                     bit_1 = 0;
                     LED_toggle(LED1);
-                    if(bit_2 == 0){
+                    if(bit_git2 == 0){
                         bit_2 = 1;
                         LED_toggle(LED2);
                     }else{
