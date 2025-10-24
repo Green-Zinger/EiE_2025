@@ -1,4 +1,4 @@
-/*
+/**
  * main.c
  */
 #include <inttypes.h>
@@ -10,36 +10,30 @@
 
 #include "BTN.h"
 #include "LED.h"
+#include "my_state_machine.h"
 
 #define SLEEP_MS 1
 
 int main(void){
 
-    if(0>BTN_init()){
+    if(0 > BTN_init()){
+        return 0;
+    }
+    
+    if(0 > LED_init()){
         return 0;
     }
 
-    if(0>LED_init()){
-        return 0;
-    }
+    state_machine_init();
 
     while(1){
-        if(BTN_check_clear_pressed(BTN0)){
-            LED_toggle(LED0);
-            printk("Button 0 pressed!\n");
+
+        int ret = state_machine_run();
+        if(0 > ret){
+            return 0;
         }
-        k_msleep(SLEEP_TIME_MS);
+
+        k_msleep(SLEEP_MS);
     }
     return 0;
-  if (0 > BTN_init()) {
-    return 0;
-  }
-  if (0 > LED_init()) {
-    return 0;
-  }
-
-  while(1) {
-    k_msleep(SLEEP_MS);
-  }
-	return 0;
 }
