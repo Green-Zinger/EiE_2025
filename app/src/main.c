@@ -12,11 +12,11 @@
 
 #define SLEEP_TIME_MS 1
 
+#define PASSWORD_LENGTH 4
+
 int main(void){
-    int bit_0 = 0;
-    int bit_1 = 0;
-    int bit_2 = 0;
-    int bit_3 = 0;
+    int password[PASSWORD_LENGTH] = {1, 2, 3, 1};
+    int input[PASSWORD_LENGTH];
     if(0>BTN_init()){
         return 0;
     }
@@ -24,44 +24,48 @@ int main(void){
     if(0>LED_init()){
         return 0;
     }
-
+    
     while(1){
-        if(BTN_check_clear_pressed(BTN0)){
-            if(bit_0 == 0){
-                bit_0 = 1;
-                LED_toggle(LED0);
-            }else{
-                bit_0 = 0;
-                LED_toggle(LED0);
-                if(bit_1 == 0){
-                    bit_1 = 1;
-                    LED_toggle(LED1);
-                }else{
-                    bit_1 = 0;
-                    LED_toggle(LED1);
-                    if(bit_git2 == 0){
-                        bit_2 = 1;
-                        LED_toggle(LED2);
-                    }else{
-                        bit_2 = 0;
-                        LED_toggle(LED2);
-                        if(bit_3 == 0){
-                            bit_3 = 1;
-                            LED_toggle(LED3);
-                        }else{
-                            bit_0 = 0;
-                            bit_1 = 0;
-                            bit_2 = 0;
-                            bit_3 = 0;
-                            LED_toggle(LED3);
-                        }
-                    }
+        LED_toggle(LED0);
+        for(int i = 0; i<PASSWORD_LENGTH; i++){
+            while(1){
+                if(BTN_check_clear_pressed(BTN0)){
+                    input[i] = 0;
+                    break;
                 }
+                else if(BTN_check_clear_pressed(BTN1)){
+                    input[i] = 1;
+                    break;
+                }
+                else if(BTN_check_clear_pressed(BTN2)){
+                    input[i] = 2;
+                    break;
+                }
+                else if(BTN_check_clear_pressed(BTN3)){
+                    input[i] = 3;
+                    break;
+                }
+                k_msleep(SLEEP_TIME_MS);
             }
-                 
+            
+        }
+        int i;
+        for(i = 0; i<PASSWORD_LENGTH; i++){
+            if(password[i]!=input[i]){
+                printk("Incorrect! You Suck!\n");
+                LED_toggle(LED0);
+                break;
+            }
+            printk(" The %dth thing is %d",i,input[i]);
+        }
+        if(i == 4){
+            printk("Correct! You are the Goat!\n");
+            LED_toggle(LED0);
+        }
+        while(!BTN_check_pressed(BTN0)&&!BTN_check_pressed(BTN1)&&!BTN_check_pressed(BTN2)&&!BTN_check_pressed(BTN3)){
+            k_msleep(SLEEP_TIME_MS);
         }
         
-        k_msleep(SLEEP_TIME_MS);
     }
     return 0;
 }
