@@ -16,12 +16,12 @@
 
 int main(void){
     if(0>BTN_init()){
-        printk("Failure setting up BTN")
+        printk("Failure setting up BTN");
         return 0;
     }
 
     if(0>LED_init()){
-        printk("Failure setting up LED")
+        printk("Failure setting up LED");
         return 0;
     }
     
@@ -32,12 +32,17 @@ int main(void){
     int password[PASSWORD_LENGTH] = {0, 1, 1, 2};
     int *input;
     int locked = 1;
-    if(input == NULL)
-        printk("Memory error.");
-        return 0;
+    
     //The main loop
     while(1){
-        *input = k_malloc(input_cap*sizeof(int));
+        //Gotta enable dynamic memory to use value the way it is being used.
+        input = k_malloc(input_cap*sizeof(int));
+        
+        if(input == NULL){
+            printk("Memory error.");
+            return 0;
+        }
+
         input_cap = PASSWORD_LENGTH;
         input_length = 0;
         LED_toggle(LED0);
@@ -53,7 +58,7 @@ int main(void){
                 for(int i =0; i<input_cap; i++)
                     input[i] = old[i];
                 input_cap*=2;
-                free(old);
+                k_free(old);
             }
             while(1){
                 if(BTN_check_clear_pressed(BTN0)){
@@ -75,14 +80,16 @@ int main(void){
         }
         //
         LED_toggle(LED0);
-        free(input);
+        k_free(input);
         if(input_length != PASSWORD_LENGTH){
             printk("Incorrect! You Suck!\n");   
         }else{
-            for(int i = 0; i<PASSWORD_LENGTH; i++){
-                if(input[i] != password[i])
+            int i;
+            for(i = 0; i<PASSWORD_LENGTH; i++){
+                if(input[i] != password[i]){
                     printk("Incorrect! You Suck!\n");
-                    break; 
+                    break;
+                }
             }
             if(i == PASSWORD_LENGTH)
                 printk("Correct! You are the Goat!\n");
