@@ -36,15 +36,15 @@ int main(void){
     //The main loop
     while(1){
         //Gotta enable dynamic memory to use value the way it is being used.
-        input = k_malloc(input_cap*sizeof(int));
-        
-        if(input == NULL){
-            printk("Memory error.");
-            return 0;
-        }
-
         input_cap = PASSWORD_LENGTH;
         input_length = 0;
+        input = k_malloc(input_cap*sizeof(int));
+        printk("Startup success\n");
+        if(input == NULL){
+            printk("Memory error.\n");
+            return 0;
+        }
+ 
         LED_toggle(LED0);
         //locked state loop
         while(locked){
@@ -63,12 +63,15 @@ int main(void){
             while(1){
                 if(BTN_check_clear_pressed(BTN0)){
                     input[input_length] = 0;
+                    input_length++;
                     break;
                 }else if(BTN_check_clear_pressed(BTN1)){
                     input[input_length] = 1;
+                    input_length++;
                     break;
                 }else if(BTN_check_clear_pressed(BTN2)){
                     input[input_length] = 2;
+                    input_length++;
                     break;
                 }else if(BTN_check_clear_pressed(BTN3)){
                     locked = 0;
@@ -76,11 +79,11 @@ int main(void){
                 }
                 k_msleep(SLEEP_TIME_MS);
             }
-
+            
         }
         //
         LED_toggle(LED0);
-        k_free(input);
+        
         if(input_length != PASSWORD_LENGTH){
             printk("Incorrect! You Suck!\n");   
         }else{
@@ -94,6 +97,8 @@ int main(void){
             if(i == PASSWORD_LENGTH)
                 printk("Correct! You are the Goat!\n");
         }
+        
+        k_free(input);
         //This is the waiting state.
         while(!locked){
             if(BTN_check_clear_pressed(BTN0)){
