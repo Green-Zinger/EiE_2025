@@ -12,7 +12,14 @@
 
 #define SLEEP_TIME_MS 1
 
-#define PASSWORD_LENGTH 4
+#define INPUT_BASE_LENGTH 4
+
+int* variable_int_input(int *length);
+//REQUIRES:
+//BUTTON and LED input are set up. Length point to a valid memory address of integer type.
+//PROMISES:
+//the return value is a pointer to array of ints that represent a sequence of button presses,
+//inputed by the user.
 
 int main(void){
     if(0>BTN_init()){
@@ -25,93 +32,113 @@ int main(void){
         return 0;
     }
     
-    //Setting up intial condition for locked password state.
-    int input_cap;
+    //Setting up intial conditions for input.
     int input_length;
-
-    int password[PASSWORD_LENGTH] = {0, 1, 1, 2};
     int *input;
-    int locked = 1;
-    
+    int sleep; 
+
+    //Setting up the initial conditions for password setting.
+    int password_length;
+    int default_password[INPUT_BASE_LENGTH] = {0, 1, 1, 2};
+    int *password = default_password;
+
+    LED_toggle(LED3);
+    for(int i = 0; i<3000; i++){
+        if(BTN_check_clear_pressed(BTN3)){
+                LED_toggle(LED3);
+                printk("Choose a password.\n");
+                password = variable_int_input(&password_length);
+                break;
+        }
+        k_msleep(SLEEP_TIME_MS);
+    }
     //The main loop
     while(1){
-        //Gotta enable dynamic memory to use value the way it is being used.
-        input_cap = PASSWORD_LENGTH;
-        input_length = 0;
-        input = k_malloc(input_cap*sizeof(int));
-        printk("Startup success\n");
-        if(input == NULL){
-            printk("Memory error.\n");
-            return 0;
-        }
- 
-        LED_toggle(LED0);
-        //locked state loop
-        while(locked){
-            if(input_length==input_cap){
-                int *old = input;
-                input = k_malloc(input_cap*2*sizeof(int));
+        sleep = 1;
+        printk("What is the password?\n");
+        input = variable_int_input(&input_length);
 
-                if(input == NULL)
-                    return 0;
-
-                for(int i =0; i<input_cap; i++)
-                    input[i] = old[i];
-                input_cap*=2;
-                k_free(old);
-            }
-            while(1){
-                if(BTN_check_clear_pressed(BTN0)){
-                    input[input_length] = 0;
-                    input_length++;
-                    break;
-                }else if(BTN_check_clear_pressed(BTN1)){
-                    input[input_length] = 1;
-                    input_length++;
-                    break;
-                }else if(BTN_check_clear_pressed(BTN2)){
-                    input[input_length] = 2;
-                    input_length++;
-                    break;
-                }else if(BTN_check_clear_pressed(BTN3)){
-                    locked = 0;
-                    break;
-                }
-                k_msleep(SLEEP_TIME_MS);
-            }
-            
-        }
-        //
-        LED_toggle(LED0);
-        
-        if(input_length != PASSWORD_LENGTH){
-            printk("Incorrect! You Suck!\n");   
+        if(input_length != password_length){
+            printk("Incorrect! You Suck! Wrong length! %d is not equal to %d\n", password_length, input_length);   
         }else{
             int i;
-            for(i = 0; i<PASSWORD_LENGTH; i++){
+            for(i = 0; i<INPUT_BASE_LENGTH; i++){
                 if(input[i] != password[i]){
-                    printk("Incorrect! You Suck!\n");
+                    printk("Incorrect! You Suck! Only got the length right!\n");
                     break;
                 }
             }
-            if(i == PASSWORD_LENGTH)
+            if(i == INPUT_BASE_LENGTH)
                 printk("Correct! You are the Goat!\n");
         }
         
         k_free(input);
         //This is the waiting state.
-        while(!locked){
+        while(sleep){
             if(BTN_check_clear_pressed(BTN0)){
-                locked = 1;
+                sleep = 0;
             }else if(BTN_check_clear_pressed(BTN1)){
-                locked = 1;
+                sleep = 0;
             }else if(BTN_check_clear_pressed(BTN2)){
-                locked = 1;
+                sleep = 0;
             }else if(BTN_check_clear_pressed(BTN3)){
-                locked = 1;
+                sleep = 0;
             }
             k_msleep(SLEEP_TIME_MS);
         }
     }
+
     return 0;
 }
+int* variable_int_input(int *length){
+    //Gotta enable dynamic memory to use value the way it is being used.
+    int cap = INPUT_BASE_LENGTH;
+    *length = 0;
+    int *arr = k_malloc(cap*sizeof(int));
+    int entry = 1;
+    if(arr == NULL){
+        printk("Memory error.\n");
+        return 0;
+    }
+    printk("Please input your button sequence now:\n\n\n");
+    LED_toggle(LED0);
+    //locked state loop
+    while(entry){
+        if(*length==cap){
+            int *old = arr;
+            arr = k_malloc(cap*2*sizeof(int));
+
+            if(arr == NULL)
+                return 0;
+
+            for(int i =0; i<cap; i++)
+                arr[i] = old[i];
+
+            cap*=2;
+            k_free(old);
+            }
+        while(1){
+            if(BTN_check_clear_pressed(BTN0)){
+                arr[*length] = 0;
+                (*length)++;
+                break;
+            }else if(BTN_check_clear_pressed(BTN1)){
+                arr[*length] = 1;
+                (*length)++;
+                break;
+            }else if(BTN_check_clear_pressed(BTN2)){
+                arr[*length] = 2;
+                (*length)++;
+                break;
+            }else if(BTN_check_clear_pressed(BTN3)){
+                entry = 0;
+                break;
+            }
+            k_msleep(SLEEP_TIME_MS);
+        }
+            
+    }
+    LED_toggle(LED0);
+    return arr;
+}
+
