@@ -38,7 +38,7 @@ int main(void){
     int sleep; 
 
     //Setting up the initial conditions for password setting.
-    int password_length;
+    int password_length=INPUT_BASE_LENGTH;
     int default_password[INPUT_BASE_LENGTH] = {0, 1, 1, 2};
     int *password = default_password;
 
@@ -121,14 +121,17 @@ int* variable_int_input(int *length){
             if(BTN_check_clear_pressed(BTN0)){
                 arr[*length] = 0;
                 (*length)++;
+                printk("input number:%d\n",*length);
                 break;
             }else if(BTN_check_clear_pressed(BTN1)){
                 arr[*length] = 1;
                 (*length)++;
+                printk("input number:%d\n",*length);
                 break;
             }else if(BTN_check_clear_pressed(BTN2)){
                 arr[*length] = 2;
                 (*length)++;
+                printk("input number:%d\n",*length);
                 break;
             }else if(BTN_check_clear_pressed(BTN3)){
                 entry = 0;
