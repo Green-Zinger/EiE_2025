@@ -42,11 +42,11 @@ typedef struct {
 * Local Variables
 ------------------------------------------*/
 static const struct smf_state states[] = {
-    [STATE_0] = SMF_CREATE_STATE(state_0_run, ,state_0_exit, NULL, NULL, NULL),
-    [STATE_1] = SMF_CREATE_STATE(state_1_run, ,state_1_exit, NULL, NULL, NULL),
-    [STATE_2] = SMF_CREATE_STATE(state_2_run, ,state_2_exit, NULL, NULL, NULL),
-    [STATE_3] = SMF_CREATE_STATE(state_3_run, ,state_3_exit, NULL, NULL, NULL),
-    [STATE_4] = SMF_CREATE_STATE(state_4_run, ,state_4_exit, NULL, NULL, NULL),
+    [STATE_0] = SMF_CREATE_STATE(state_0_entry, state_0_run, NULL, NULL, NULL),
+    [STATE_1] = SMF_CREATE_STATE(state_1_entry, state_1_run, NULL, NULL, NULL),
+    [STATE_2] = SMF_CREATE_STATE(state_2_entry, state_2_run, NULL, NULL, NULL),
+    [STATE_3] = SMF_CREATE_STATE(state_3_entry, state_3_run, NULL, NULL, NULL),
+    [STATE_4] = SMF_CREATE_STATE(state_4_entry, state_4_run, NULL, NULL, NULL)
 };
 static state_object_t state_object;
 
@@ -66,7 +66,7 @@ static state_object_t state_object;
     LED_set(LED3, LED_OFF);
  }
  
- static enum smf_state_result led_on_state_run(void* o){
+ static enum smf_state_result state_0_run(void* o){
     if(BTN_check_clear_pressed(BTN0)){
         smf_set_state(SMF_CTX(&state_object), &states[STATE_1]);
     } 
@@ -74,24 +74,64 @@ static state_object_t state_object;
  }
  
  static void state_1_entry(void* o){
-    LED_blink(LED0,1)
+    LED_blink(LED0,4);
  }
  static enum smf_state_result state_1_run(void* o){
     if(BTN_check_clear_pressed(BTN1)){
         smf_set_state(SMF_CTX(&state_object), &states[STATE_2]);
     }else if(BTN_check_clear_pressed(BTN2)){
-        smf_set_state(SMF_CTX(&state_object), &state[STATE_3]);
+        smf_set_state(SMF_CTX(&state_object), &states[STATE_4]);
+    }else if(BTN_check_clear_pressed(BTN3)){
+        smf_set_state(SMF_CTX(&state_object), &states[STATE_0]);
     }
-    return SMF_EVENT_HANDLED
+    return SMF_EVENT_HANDLED;
  }
  static void state_2_entry(void* o){
     LED_set(LED0, LED_ON);
     LED_set(LED2, LED_ON);
     LED_set(LED1, LED_OFF);
     LED_set(LED3, LED_OFF);
- }
+ } 
  static enum smf_state_result state_2_run(void* o){
-    if(state_object.count >)
+    if(state_object.count > 1000){
+      state_object.count=0;
+      smf_set_state(SMF_CTX(&state_object), &states[STATE_3]);  
+    }else if(BTN_check_clear_pressed(BTN3)){
+      state_object.count=0;
+      smf_set_state(SMF_CTX(&state_object), &states[STATE_0]);
+    }else{
+      state_object.count++;
+    }
+    return SMF_EVENT_HANDLED;
  }
-
  
+ static void state_3_entry(void* o){
+    LED_set(LED0, LED_OFF);
+    LED_set(LED2, LED_OFF);
+    LED_set(LED1, LED_ON);
+    LED_set(LED3, LED_ON);  
+ }
+ static enum smf_state_result state_3_run(void* o){
+    if(state_object.count > 2000){
+      state_object.count=0;
+      smf_set_state(SMF_CTX(&state_object), &states[STATE_2]); 
+    }else if(BTN_check_clear_pressed(BTN3)){
+      state_object.count=0;
+      smf_set_state(SMF_CTX(&state_object), &states[STATE_0]);
+    }else{
+      state_object.count++;
+    }
+    return SMF_EVENT_HANDLED;
+ }
+ static void state_4_entry(void* o){
+    LED_blink(LED0,16);
+    LED_blink(LED1,16);
+    LED_blink(LED2,16);
+    LED_blink(LED3,16);
+ }
+ static enum smf_state_result state_4_run(void* o){
+    if(BTN_check_clear_pressed(BTN3)){
+      smf_set_state(SMF_CTX(&state_object), &states[STATE_0]);
+    }
+    return SMF_EVENT_HANDLED;
+ }
